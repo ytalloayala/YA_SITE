@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YA-QRCODE</title>
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      color: white;
+      text-align: center;
+      background: radial-gradient(circle at center, #0f0, #00f, #f0f);
+      background-size: cover;
+      animation: hologram 10s infinite alternate;
+    }
+
+    @keyframes hologram {
+      0% { filter: hue-rotate(0deg); }
+      100% { filter: hue-rotate(360deg); }
+    }
+
+    h1 {
+      margin-top: 40px;
+      font-size: 3em;
+      text-shadow: 2px 2px 8px black;
+    }
+
+    .button {
+      display: inline-block;
+      margin: 20px;
+      padding: 20px 40px;
+      font-size: 1.5em;
+      background: rgba(0,0,0,0.6);
+      border: 2px solid white;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+
+    .button:hover {
+      transform: scale(1.1);
+      background: rgba(255,255,255,0.2);
+    }
+
+    .upload {
+      margin-top: 40px;
+      background: rgba(0,0,0,0.5);
+      padding: 20px;
+      border-radius: 10px;
+    }
+
+    input[type="file"] {
+      margin: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>YA-QRCODE</h1>
+
+  <div>
+    <button class="button">Vídeos</button>
+    <button class="button">Imagens</button>
+  </div>
+
+  <div class="upload">
+    <h2>Upload de Arquivos</h2>
+    <form>
+      <label>Enviar Imagem:</label>
+      <input type="file" accept="image/*"><br>
+      <label>Enviar Vídeo:</label>
+      <input type="file" accept="video/*"><br>
+      <button type="submit" class="button">Enviar</button>
+    </form>
+  </div>
+
+  <div class="qr-generator">
+    <h2>Gerador de QR Code</h2>
+    <input type="text" id="qr-text" placeholder="Digite o texto ou URL para o QR Code">
+    <br>
+    <input type="file" id="file-input" accept=".txt">
+    <button class="button" onclick="loadFile()">Carregar Arquivo de Texto</button>
+    <br>
+    <button class="button" onclick="generateQR()">Gerar QR Code</button>
+    <div id="qr-code"></div>
+    <button class="button" onclick="downloadQR()">Baixar QR Code</button>
+  </div>
+
+  <script>
+    function generateQR() {
+      const text = document.getElementById('qr-text').value;
+      if (!text) {
+        alert('Por favor, digite um texto ou carregue um arquivo.');
+        return;
+      }
+      const qrDiv = document.getElementById('qr-code');
+      qrDiv.innerHTML = '';
+      QRCode.toCanvas(text, { width: 256 }, function (error, canvas) {
+        if (error) {
+          console.error(error);
+          alert('Erro ao gerar QR Code.');
+        } else {
+          qrDiv.appendChild(canvas);
+        }
+      });
+    }
+
+    function downloadQR() {
+      const canvas = document.querySelector('#qr-code canvas');
+      if (canvas) {
+        const link = document.createElement('a');
+        link.download = 'qrcode.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      } else {
+        alert('Gere um QR Code primeiro.');
+      }
+    }
+
+    function loadFile() {
+      const file = document.getElementById('file-input').files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          document.getElementById('qr-text').value = e.target.result;
+        };
+        reader.readAsText(file);
+      } else {
+        alert('Selecione um arquivo de texto.');
+      }
+    }
+  </script>
+</body>
+</html>
